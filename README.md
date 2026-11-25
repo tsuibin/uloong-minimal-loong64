@@ -61,7 +61,7 @@ sudo apt install cpio gzip mtools dpkg-deb qemu-system-loongarch64 ovmf  # ÂêçÁß
 ```sh
 export WORK=~/work/loong64-minimal
 mkdir -p "$WORK"
-git clone <this-repo> "$WORK/guide"
+git clone https://github.com/tsuibin/uloong-minimal-loong64.git "$WORK/guide"
 cd "$WORK/guide"
 ```
 
