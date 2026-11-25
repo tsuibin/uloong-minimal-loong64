@@ -1,0 +1,36 @@
+#!/bin/sh
+# PID 1 for the minimal system. The whole rootfs lives inside the initramfs.
+# __KVER__ is replaced by scripts/make-initrd.sh with your kernel version.
+
+export PATH=/usr/bin:/bin:/usr/sbin:/sbin
+
+echo "=== loong64 minimal system :: kernel $(uname -r) ==="
+
+mkdir -p /proc /sys /dev /run /tmp /root
+mount -t proc proc /proc 2>/dev/null
+mount -t sysfs sysfs /sys 2>/dev/null
+mount -t devtmpfs devtmpfs /dev 2>/dev/null || mount -t tmpfs tmpfs /dev 2>/dev/null
+mount -t tmpfs tmpfs /run 2>/dev/null
+
+# IMPORTANT: do not redirect stdio here. PID 1 already inherits the console
+# from the kernel; opening /dev/console explicitly breaks serial input.
+
+# Modules commonly needed by QEMU 'virt' and many LoongArch boards.
+KVER=__KVER__
+M=/usr/lib/modules/$KVER/kernel
+for m in \
+    $M/drivers/virtio/virtio_pci_modern_dev.ko \
+    $M/drivers/virtio/virtio_pci_legacy_dev.ko \
+    $M/drivers/virtio/virtio_pci.ko \
+    $M/drivers/virtio/virtio_console.ko; do
+    [ -f "$m" ] && /usr/bin/busybox insmod "$m" 2>/dev/null
+done
+
+/usr/bin/busybox mdev -s 2>/dev/null
+/usr/bin/busybox ip link set lo up 2>/dev/null
+
+echo "Minimal system ready (rootfs in RAM)."
+echo "Try: uname -a ; cat /etc/os-release ; dpkg -l | head"
+echo
+export PS1='loong64-minimal:/# '
+exec /bin/sh

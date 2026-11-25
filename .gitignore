@@ -1,0 +1,13 @@
+# 构建产物
+work/
+*.img
+*.iso
+*.qcow2
+*.gz
+*.deb
+
+# 日志与临时文件
+*.log
+.tmp/
+__pycache__/
+*.pyc
